@@ -1,5 +1,7 @@
 # LiDAR-Gait-Analysis
 
+Dependencies: OpenCV-python (version 4.11.0.86), Numpy (version 1.26.4), Mediapipe (version 0.10.21)
+
 The analysis folder contains 5 python programs: png2realdepth, distancefrompoints, makevideo, 3dframe, and 3dvid. It also includes an example LiDAR data folder (Walking_LiDAR_data) which can be used as an input folder for the python programs.
 
 Usage pipeline: The user should record videos using the Stray Scanner app, which sends the LiDAR data from the video into a folder located in the device’s Files app. This LiDAR data folder should then be added to the same folder that contains the python programs being run, just like the example folder (Walking_LiDAR_data) is. After this is done, the programs are able to be run as long as the necessary dependencies are installed (numpy, opencv, open3d, matplotlib).
