@@ -106,7 +106,7 @@ def get_landmark_arr(body_part, pos_array, part_name):
                     pointx = np.clip(pointx, 0, depth_meters.shape[1] - 1)
                     pointy = np.clip(pointy, 0, depth_meters.shape[0] - 1)
                     # Get z value at landmark pixel location
-                    if frame_i == 0 or cv2.imread(os.path.join(conf_folder, conf_files[frame_i]), cv2.IMREAD_UNCHANGED)[pointx, pointy] > 0:
+                    if frame_i == 0 or cv2.rotate(cv2.imread(os.path.join(conf_folder, conf_files[frame_i]), cv2.IMREAD_UNCHANGED), cv2.ROTATE_90_CLOCKWISE)[pointy, pointx] > 0:
                         z = depth_meters[pointy, pointx]
                     else:
                         if frame_i == 0:
