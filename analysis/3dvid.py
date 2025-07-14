@@ -5,6 +5,7 @@ import open3d as o3d
 
 #retrieve files
 folder = input("Folder name: ")
+outfile = input("Output filename: ")
 csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
 depth_folder = os.path.join(folder, "depth")
 depth_files = sorted(os.listdir(depth_folder))
@@ -26,7 +27,6 @@ fx, fy = matrixscaled[0, 0], matrixscaled[1, 1]
 cx, cy = matrixscaled[0, 2], matrixscaled[1, 2]
 
 #get video ready
-frames = []
 frame_index = 0
 
 def get_point_cloud(filename):
@@ -50,9 +50,10 @@ render_option.point_size = 4
 pcd = get_point_cloud(depth_files[0])
 vis.add_geometry(pcd)
 
+out = None
 #move thru frames
 def animation_callback(vis):
-    global frame_index, pcd, frames
+    global frame_index, pcd
     if frame_index >= len(depth_files):
         vis.close()
         return False
@@ -63,7 +64,16 @@ def animation_callback(vis):
 
     img = vis.capture_screen_float_buffer(do_render=True)
     img = (255 * np.asarray(img)).astype(np.uint8)
-    frames.append(img)
+
+    global out
+    if out is None:
+        height, width, _ = img.shape
+        size = (width, height)
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(outfile, fourcc, 60, size)
+
+    img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    out.write(img_bgr)
 
     frame_index += 1
     return False
@@ -72,3 +82,5 @@ def animation_callback(vis):
 vis.register_animation_callback(animation_callback)
 vis.run()
 vis.destroy_window()
+
+out.release()
