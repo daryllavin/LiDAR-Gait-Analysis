@@ -42,6 +42,7 @@ def calculate_angle(A, B, C):
     return angle_deg
 
 def plot_point_over_time(data, label, save_path):
+    data = np.array(data)
     frames = np.arange(data.shape[0]) / 60
     plt.figure(figsize=(10, 6))
     plt.plot(frames, data[:, 2], label='Z')
@@ -115,12 +116,12 @@ def main(folder=None, bp=None):
 if __name__ == '__main__':
     folder, input1, input2, input3, l1, l2, l3, l4 = main()
     # Plot and save charts for each point's x, y, z over time
-    plot_point_over_time(l1, input1, f'{folder} {input1} distance.png')
-    plot_point_over_time(l2, input2, f'{folder} {input2} distance.png')
-    plot_point_over_time(l3, input3, f'{folder} {input3} distance.png')
+    plot_point_over_time(l1, input1, f'charts/{folder}/{input1} distance.png')
+    plot_point_over_time(l2, input2, f'charts/{folder}/{input2} distance.png')
+    plot_point_over_time(l3, input3, f'charts/{folder}/{input3} distance.png')
 
     # Plot and save angle over time
-    plot_angle_over_time(l4, input1, f'{folder} {input1} angle.png')
+    plot_angle_over_time(l4, input1, f'charts/{folder}/{input1} angle.png')
 
     # If not being run as a module, print the angle at each frame
     for angle in l4:

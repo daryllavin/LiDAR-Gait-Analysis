@@ -7,7 +7,7 @@ dorc = input("depth or confidence? ")
 output = input("Output video filename: ")
 fps = 60
 
-paths = sorted([os.path.join(folder, dorc, f) for f in os.listdir(folder + "/" + dorc) if f.endswith(".png")])
+paths = sorted([os.path.join("..", folder, dorc, f) for f in os.listdir("../" + folder + "/" + dorc) if f.endswith(".png")])
 
 if not paths:
     raise RuntimeError("No PNG files found in folder.")
@@ -46,7 +46,7 @@ for path in paths:
 out.release()
 
 depth_cap = cv2.VideoCapture(output) 
-rgb_cap = cv2.VideoCapture(folder + "/rgb.mp4")
+rgb_cap = cv2.VideoCapture(".." + folder + "/rgb.mp4")
 
 cmb_output = input("Comparative video filename: ")
 

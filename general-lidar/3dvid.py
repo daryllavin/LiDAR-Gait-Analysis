@@ -6,8 +6,8 @@ import open3d as o3d
 #retrieve files
 folder = input("Folder name: ")
 outfile = input("Output filename: ")
-csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
-depth_folder = os.path.join(folder, "depth")
+csvmatrix = np.loadtxt(f'../{folder}/camera_matrix.csv', delimiter=',')
+depth_folder = os.path.join("..", folder, "depth")
 depth_files = sorted(os.listdir(depth_folder))
 
 #get shape and scale
