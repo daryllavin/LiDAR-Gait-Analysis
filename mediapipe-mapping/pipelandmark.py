@@ -19,120 +19,117 @@ landmark_map = {
     "right ankle": 28,
 }
 
-# Get depth/confidence folder/files by sorting the file numbers
-folder = input("Folder name: ")
-depth_folder = os.path.join(folder, "depth")
-depth_files = sorted(os.listdir(depth_folder))
-conf_folder = os.path.join(folder, "confidence")
-conf_files = sorted(os.listdir(conf_folder))
+# LiDAR video dimensions
+width, height = 192, 256
 
-# Initialize MediaPipe pose class
-mp_pose = mp.solutions.pose
+def extract_landmarks(folder, input1, input2, input3):
+    # Paths
+    video_path = os.path.join(folder, "rgb.mp4")
+    depth_folder = os.path.join(folder, "depth")
+    conf_folder = os.path.join(folder, "confidence")
+    depth_files = sorted(os.listdir(depth_folder))
+    conf_files = sorted(os.listdir(conf_folder))
 
-# Load video
-video_path = os.path.join(folder, "rgb.mp4")
+    # Load and scale intrinsics
+    csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
+    scale_x = height / 1440
+    scale_y = width / 1920
+    matrixscaled = csvmatrix.copy()
+    matrixscaled[0, 0] *= scale_x
+    matrixscaled[1, 1] *= scale_y
+    matrixscaled[0, 2] *= scale_x
+    matrixscaled[1, 2] *= scale_y
+    fx, fy = matrixscaled[0, 0], matrixscaled[1, 1]
+    cx, cy = matrixscaled[0, 2], matrixscaled[1, 2]
 
-# Video dimesions
-width = 192
-height = 256
+    # Landmark indices
+    idx1, idx2, idx3 = landmark_map[input1], landmark_map[input2], landmark_map[input3]
 
-#scale intrinsics
-csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
-scale_x = height / 1440
-scale_y = width / 1920
-matrixscaled = csvmatrix.copy()
-matrixscaled[0, 0] *= scale_x
-matrixscaled[1, 1] *= scale_y
-matrixscaled[0, 2] *= scale_x
-matrixscaled[1, 2] *= scale_y
-fx, fy = matrixscaled[0, 0], matrixscaled[1, 1]
-cx, cy = matrixscaled[0, 2], matrixscaled[1, 2]
+    # Output arrays
+    l1_arr, l2_arr, l3_arr = [], [], []
 
-# Insert x, y, z locations of body_part into pos_array
-def get_landmark_arr(body_part, pos_array, part_name):
+    # Pose estimation setup
+    mp_pose = mp.solutions.pose
     cap = cv2.VideoCapture(video_path)
-    # Set up Pose estimator
-    with mp_pose.Pose(static_image_mode=False,
-                    model_complexity=2,
-                    enable_segmentation=False,
-                    min_detection_confidence=0.5,
-                    min_tracking_confidence=0.5) as pose:
-        prev = None
+    with mp_pose.Pose(static_image_mode=False, model_complexity=2,
+                      enable_segmentation=False,
+                      min_detection_confidence=0.5,
+                      min_tracking_confidence=0.5) as pose:
+
         frame_i = 0
+        prev = {idx1: None, idx2: None, idx3: None}
+
+        # Read frames
         while cap.isOpened():
-            # Read frame
             ret, frame = cap.read()
-            # Break if not able to be read
             if not ret:
                 break
-
-            # Properly format frame
+            
+            # Orient frame and change to RGB for mediapipe
             frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-            frame = cv2.resize(frame, (width,height))
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame.flags.writeable = True
+            frame = cv2.resize(frame, (width, height))
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            # Perform pose detection
-            results = pose.process(frame)
+            results = pose.process(rgb_frame)
 
-            # If able to get landmarks from frame
-            if results.pose_landmarks:
-                # get elbow
-                landmark = results.pose_landmarks.landmark[body_part]
-                landmark_x = int(landmark.x * width)
-                landmark_y = int(landmark.y * height)
-                pos = (landmark_x, landmark_y)
-                prev = pos
-            # Otherwise use the same landmark as previous frame
-            else:
-                pos = prev
+            if frame_i == 0:
+                print("Loading...")
 
-            # Only proceed if pos is valid
-            if pos:
-                # Get depth data from the frame
-                depth_path = os.path.join(depth_folder, depth_files[frame_i])
-                depth_mm = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
-                depth_mm = cv2.rotate(depth_mm, cv2.ROTATE_90_CLOCKWISE)
-                # Check that depth data was read properly
-                if depth_mm is None:
-                    print(f"Could not load depth image {depth_path}")
-                    z = None
+            # Load depth/confidence once per frame
+            depth_mm = cv2.imread(os.path.join(depth_folder, depth_files[frame_i]), cv2.IMREAD_UNCHANGED)
+            conf = cv2.imread(os.path.join(conf_folder, conf_files[frame_i]), cv2.IMREAD_UNCHANGED)
+            if depth_mm is None or conf is None:
+                print(f"Missing depth/confidence at frame {frame_i}")
+                break
+
+            # Orient/convert depth and confidence data
+            depth_mm = cv2.rotate(depth_mm, cv2.ROTATE_90_CLOCKWISE)
+            conf = cv2.rotate(conf, cv2.ROTATE_90_CLOCKWISE)
+            depth_meters = depth_mm / 1000.0
+
+            # Takes in a landmark index and array label and returns the 3d coordinate of the point if it is confident enough, otherwise defaulting back to that of the previous frame
+            def extract_one(idx, label):
+                if results.pose_landmarks:
+                    lm = results.pose_landmarks.landmark[idx]
+                    pos = (int(lm.x * width), int(lm.y * height))
+                    prev[idx] = pos
                 else:
-                    # Convert depth to meters
-                    depth_meters = depth_mm / 1000.0
-                    # Re-extract x and y pixel coords from pos
-                    pointx, pointy = pos
-                    # Clamp coordinates within image bounds
-                    pointx = np.clip(pointx, 0, depth_meters.shape[1] - 1)
-                    pointy = np.clip(pointy, 0, depth_meters.shape[0] - 1)
-                    # Get z value at landmark pixel location
-                    if frame_i == 0 or cv2.rotate(cv2.imread(os.path.join(conf_folder, conf_files[frame_i]), cv2.IMREAD_UNCHANGED), cv2.ROTATE_90_CLOCKWISE)[pointy, pointx] > 0:
+                    pos = prev[idx]
+
+                if pos:
+                    pointx = np.clip(pos[0], 0, width - 1)
+                    pointy = np.clip(pos[1], 0, height - 1)
+                    if frame_i == 0 or conf[pointy, pointx] > 0:
                         z = depth_meters[pointy, pointx]
                     else:
-                        if frame_i == 0:
-                            print("Error, unconfident first frame")
-                            continue
-                        z = pos_array[frame_i - 1][2]
-                    print(f"Depth at {part_name} (frame {frame_i}) at {pointx},{pointy}: {z}")
-            else:
-                print(f"No valid position for frame {frame_i}")
-            x = (pointx - cx) * z / fx
-            y = (pointy - cy) * z / fy    
-            pos_array.append((x, y, z))
-            # Increment frame index
+                        # Fallback to previous z
+                        z = {'l1': l1_arr, 'l2': l2_arr, 'l3': l3_arr}[label][frame_i - 1][2]
+                    x = (pointx - cx) * z / fx
+                    y = (pointy - cy) * z / fy
+                    return (x, y, z)
+                else:
+                    print(f"No position for {label} at frame {frame_i}")
+                    return (0, 0, 0)
+
+            # Add the 3d coordinates to the arrays
+            l1_arr.append(extract_one(idx1, 'l1'))
+            l2_arr.append(extract_one(idx2, 'l2'))
+            l3_arr.append(extract_one(idx3, 'l3'))
+
             frame_i += 1
 
-input1 = input("left knee, right knee, left elbow, or right elbow: ")
-input2 = input("left hip, right hip, left shoulder, or right shoulder: ")
-input3 = input("left ankle, right ankle, left wrist, or right wrist: ")
+    # Save to cache
+    save_dir = os.path.join(folder, input1)
+    os.makedirs(save_dir, exist_ok=True)
+    np.savez(os.path.join(save_dir, "landmark_cache.npz"),
+             l1=l1_arr, l2=l2_arr, l3=l3_arr,
+             input1=input1, input2=input2, input3=input3)
 
-landmark1 = landmark_map[input1]
-l1_arr = []
-landmark2 = landmark_map[input2]
-l2_arr = []
-landmark3 = landmark_map[input3]
-l3_arr = []
+    return l1_arr, l2_arr, l3_arr, input1, input2, input3
 
-get_landmark_arr(landmark1, l1_arr, input1)
-get_landmark_arr(landmark2, l2_arr, input2)
-get_landmark_arr(landmark3, l3_arr, input3)
+if __name__ == '__main__':
+    folder = input("Folder name: ")
+    input1 = input("left knee, right knee, left elbow, or right elbow: ")
+    input2 = input("left hip, right hip, left shoulder, or right shoulder: ")
+    input3 = input("left ankle, right ankle, left wrist, or right wrist: ")
+    extract_landmarks(folder, input1, input2, input3)

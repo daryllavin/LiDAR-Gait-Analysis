@@ -1,8 +1,36 @@
 import numpy as np
-from pipelandmark import l1_arr as l1
-from pipelandmark import l2_arr as l2
-from pipelandmark import l3_arr as l3
-from pipelandmark import input1, input2, input3
+import os
+
+folder = input("Folder name: ")
+bp = input("Body part (left knee, right knee, left elbow, right elbow, left hip, right hip): ")
+landmark_map = {
+    "left elbow": ("left elbow", "left shoulder", "left wrist"),
+    "right elbow": ("right elbow", "right shoulder", "right wrist"),
+    "left hip": ("left hip", "left shoulder", "left knee"),
+    "right hip": ("right hip", "right shoulder", "right knee"),
+    "left knee": ("left knee", "left hip", "left ankle"),
+    "right knee": ("right knee", "right hip", "right ankle")
+}
+bp1, bp2, bp3 = landmark_map[bp]
+CACHE_FILE = f'{folder}/{bp}/landmark_cache.npz'
+
+# Try to load from cache
+if os.path.exists(CACHE_FILE):
+    data = np.load(CACHE_FILE)
+    l1 = data['l1']
+    l2 = data['l2']
+    l3 = data['l3']
+    input1 = data['input1'].tolist()
+    input2 = data['input2'].tolist()
+    input3 = data['input3'].tolist()
+    print("Loaded from cache")
+else:
+    print("Running pipelandmark...")
+    from pipelandmark import extract_landmarks
+    l1, l2, l3, input1, input2, input3 = extract_landmarks(folder, bp1, bp2, bp3)
+
+    # Save to cache
+    np.savez(CACHE_FILE, l1=l1, l2=l2, l3=l3, input1=input1, input2=input2, input3=input3)
 
 def calculate_angle(A, B, C):
     # Turn tuples to numpy arrays
@@ -33,12 +61,16 @@ def calculate_angle(A, B, C):
 
     return angle_deg
 
-# Print out angle at each frame
+# Add angle at each frame
+l4 = []
 for i in range(len(l1)):
+    l4.append(calculate_angle(l2[i], l1[i], l3[i]))
     print(calculate_angle(l2[i], l1[i], l3[i]))
 
 # Save the x,y,z data for each body part in csv files
-np.savetxt(f'{input1}.csv', l1, delimiter=',', fmt='%s')
-np.savetxt(f'{input2}.csv', l2, delimiter=',', fmt='%s')
-np.savetxt(f'{input3}.csv', l3, delimiter=',', fmt='%s')
-
+save_dir = f'charts/{folder}'
+os.makedirs(save_dir, exist_ok=True)
+np.savetxt(f'charts/{folder}/{input1}.csv', l1, delimiter=',', fmt='%s')
+np.savetxt(f'charts/{folder}/{input2}.csv', l2, delimiter=',', fmt='%s')
+np.savetxt(f'charts/{folder}/{input3}.csv', l3, delimiter=',', fmt='%s')
+np.savetxt(f'charts/{folder}/{input3} angle.csv', l4, delimiter=',', fmt='%s')
