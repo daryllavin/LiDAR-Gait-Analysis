@@ -8,11 +8,16 @@ mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 
 # Load video
-video_path = 'lowframes/rgb.mp4'
+folder = input("Folder name: ")
+video_path = f'{folder}/rgb.mp4'
 cap = cv2.VideoCapture(video_path)
 
 width = 192
 height = 256
+
+outfile = input("Output filename: ")
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter(outfile, fourcc, 60, (width, height))
 
 # Set up Pose estimator
 with mp_pose.Pose(static_image_mode=False,
@@ -46,6 +51,8 @@ with mp_pose.Pose(static_image_mode=False,
         cv2.imshow('MediaPipe Pose', image)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        out.write(image)
 
 cap.release()
 cv2.destroyAllWindows()
+out.release()
