@@ -37,7 +37,7 @@ For gait analysis, MediaPipe is used to track joint locations which can be mappe
 
 Using the MediaPipe pose tracking along with LiDAR data, graphs are generated like the ones below (similar graphs can be created for different human joints). The first graph displays the right knee angle over time which documents the transition from sitting to walking (fluctuations at the end reflect the knee leaving frame). The second graph shows the movement of the right knee's position over time compared to a trendline, and creates a detrended line which provides insights into how the knee is moving over time:
 
-<img src=sample-results/rightkneeangle.png width="500"> <img src=sample-results/Rightkneedetrended.png width="500">
+<img src=sample-results/rightkneeangle.png width="350"> <img src=sample-results/Rightkneedetrended.png width="350">
 
 ## Requirements
 - Python 3.10 (recommended, as specified in env.yaml)
