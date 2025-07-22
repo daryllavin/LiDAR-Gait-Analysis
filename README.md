@@ -43,7 +43,7 @@ Using the MediaPipe pose tracking along with LiDAR data, graphs are generated li
 - Python 3.10 (recommended, as specified in env.yaml)
 - [Anaconda](https://www.anaconda.com/)
 - iPhone 12 Pro+ or iPad Pro with LiDAR
-- [Stray Scanner](https://apps.apple.com/us/app/stray-scanner/id1564126243) app to record LiDAR data
+- [Stray Scanner](https://apps.apple.com/us/app/stray-scanner/id1557051662) app to record LiDAR data
 
 ## Installation
 
