@@ -87,7 +87,7 @@ To run a gait-analysis program, see [Gait-Analysis](#gait-analysis)
 Ex. run makevideo.py:
 
    ```bash
-   python3 general-lidar/makevideo.py
+   python3.10 general-lidar/makevideo.py
    ```
 
 ### Purpose
@@ -134,7 +134,7 @@ It first prompts the user to input their LiDAR data folder name, as well as an o
 Ex. run calculateangle.py:
 
    ```bash
-   python3 gait-analysis/calculateangle.py
+   python3.10 gait-analysis/calculateangle.py
    ```
 
 ### Purpose
