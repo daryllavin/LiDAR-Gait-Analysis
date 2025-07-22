@@ -1,4 +1,4 @@
-# 🚶 LiDAR Gait Analysis🚶
+# LiDAR Gait Analysis
 
 This project analyzes human gait using RGB-D video from LiDAR-enabled iPhones/iPads, combining 3D pose estimation with depth data to detect trends in Parkinsonian gait.
 
