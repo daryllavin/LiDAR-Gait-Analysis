@@ -69,28 +69,26 @@ To utilize the LiDAR capabilities of the iPhone/iPad, you must have a LiDAR-equi
 
 The **Stray Scanner** app (available on the App Store) should be used to record LiDAR videos. When recording for gait analysis, ensure the video is recorded at **60 FPS** for accurate joint tracking and analysis.
 
-Each recording session is saved as a folder in the Files app. This folder includes:
+Each video recorded with Stray Scanner is saved to a folder in the Files app. This folder includes:
 - Camera intrinsic files (camera_matrix.csv, imu.csv, odometry.csv)
 - The original RGB video (rgb.mp4)
 - Folders for depth and confidence frames (depth/, confidence/) as PNGs
 
-Rename this folder and move it into your cloned LiDAR-Gait-Analysis repository. Once placed there, the programs can process and analyze the video.
+Locate this folder in the Files app, rename it to your desired name, and move the folder into the **root directory** of your cloned LiDAR-Gait-Analysis repository. Once placed there, the programs are able process and analyze the video.
 
-To run a general-lidar program, see [General-LiDAR](#general-lidar)
-
-To run a gait-analysis program, see [Gait-Analysis](#gait-analysis)
-
-## General-LiDAR
-
-### Running a General-LiDAR Script
-
-Ex. run makevideo.py:
+To run a [general-lidar](#general-lidar) program (ex. makevideo.py), ensure you are in the root directory of the cloned repo and run
 
    ```bash
    python3.10 general-lidar/makevideo.py
    ```
 
-### Purpose
+To run a [gait-analysis](#gait-analysis) program (ex. calculateangle.py), ensure you are in the root directory of the cloned repo and run
+
+   ```bash
+   python3.10 gait-analysis/calculateangle.py
+   ```
+
+## General-LiDAR
 
 The general-lidar folder contains 5 programs whose functionalities are described below. These programs are general-purpose LiDAR data analysis and visualization tools as opposed to specific tools targeted for gait analysis.
 
@@ -129,16 +127,6 @@ It first prompts the user to input their LiDAR data folder name, as well as an o
 
 ## Gait-Analysis
 
-### Running a Gait-Analysis Script
-
-Ex. run calculateangle.py:
-
-   ```bash
-   python3.10 gait-analysis/calculateangle.py
-   ```
-
-### Purpose
-
 The gait-analysis folder contains 4 programs whose functionalities are described below. These programs utilize the MediaPipe pose estimation model to track joint locations over time, and map the joints to the LiDAR depth data which allows for analysis of gait through 3D pose tracking.
 
 ### Gait-Analysis Summary
@@ -146,7 +134,7 @@ The gait-analysis folder contains 4 programs whose functionalities are described
 | Script              | Description                                                                 |
 |---------------------|-----------------------------------------------------------------------------|
 | visualize.py      | Overlays MediaPipe pose landmarks on the video and saves it as an MP4       |
-| calculateangle.py | Calculates joint angles (e.g., knees, elbows); saves CSV + graphs           |
+| calculateangle.py | Calculates joint locations and angles over time; saves CSV + graphs           |
 | detrend.py        | Plots joint movement over time, removes trendline for better insight        |
 | pipelandmark.py   | Helper module for joint location extraction (not used on its own)         |
 
@@ -154,12 +142,12 @@ The gait-analysis folder contains 4 programs whose functionalities are described
 
 It first prompts the user to input their LiDAR data folder name as well as an output file name (which should be in MP4 format). It then plays the original RGB video with pose estimation joint landmarks from MediaPipe drawn onto the video, saving this to the output file.
 
-**calculateangle.py**: This program computes and prints the angle at a specific joint over time. It saves this data as well as the location data for the three joints used to calculate this angle as CSV files, and also generates graphs of the data over time.
+**calculateangle.py**: This program computes the elbow, knee, and hip angles over time. It saves this data as well as the 3D location data for each body part (joints) over time as CSV files, and also generates graphs of the data over time. These are saved to the charts folder in "data" and "graphs" subfolders, respectively.
 
-It first prompts the user to input their LiDAR data folder name as well as a body part which should be either left knee, right knee, left elbow, right elbow, left hip, or right hip. It then prints the computed angle at that joint (e.g., left elbow angle) for each frame in the video. Additionally, in the charts folder (which it creates if it doesn't already exist), it creates CSV files for the 3D location of each of the 3 body parts used to calculate that angle (i.e. left elbow, left shoulder, and left wrist to calculate the left elbow angle), as well as a CSV file containing the angle data for each frame. It also creates graphs in PNG format to visualize the distance of each of these 3 body parts from the camera over time and a graph for the angle over time.
+It first prompts the user to input their LiDAR data folder name. In the charts/data folder (which it creates if it doesn't already exist), it creates CSV files for the 3D location of each body part over time, as well as CSV files containing the elbow, knee, and hip angle data in degrees over time. It also creates graphs in PNG format to visualize the distance of each of the body parts from the camera over time and graphs for the angle over time. These are in charts/graphs.
 
-**detrend.py**: This program creates a PNG graph of the distance of a body part from the camera over time. This data is plotted alongside a trendline, and a detrended line is generated.
+**detrend.py**: This program creates a PNG graph of the distance of body parts (joints) from the camera over time. This data is plotted alongside a trendline, and a detrended line is generated.
 
-It first prompts the user to input their LiDAR data folder name as well as a body part (which should be either left elbow, left shoulder, left wrist, left knee, left hip, left ankle, right elbow, right shoulder, right wrist, right knee, right hip, or right ankle). It then creates a PNG graph of the distance of that body part from the camera over time along with a trendline. It also plots a detrended line by plotting the difference between the actual distance and the trendline over time.
+It first prompts the user to input their LiDAR data folder name. It then creates a PNG graphs of the distance of each body part from the camera over time along with a trendline. It also plots a detrended line by plotting the difference between the actual distance and the trendline over time. These PNG's are saved to charts/detrended/
 
 **pipelandmark**: This program is a helper module and not meant to be executed directly. It is automatically imported by calculateangle.py and detrend.py which require joint landmark extraction.
