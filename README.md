@@ -67,14 +67,14 @@ Make sure you have [Anaconda](https://www.anaconda.com/) installed.
 
 To utilize the LiDAR capabilities of the iPhone/iPad, you must have a LiDAR-equipped device (iPhone 12+ Pro/Pro Max, or iPad Pro).
 
-The **Stray Scanner** app (available on the App Store) should be used to record LiDAR videos. When recording for gait analysis, ensure the video is recorded at **60 FPS** for accurate joint tracking and analysis.
+The **Stray Scanner** app (available on the App Store) should be used to record LiDAR videos. When recording for gait analysis, press the record video button and ensure the video is recorded at **60 FPS** for accurate joint tracking and analysis.
 
-Each video recorded with Stray Scanner is saved to a folder in the Files app. This folder includes:
+Each video recorded with Stray Scanner is saved to a folder in the **Files** app. This folder includes:
 - Camera intrinsic files (camera_matrix.csv, imu.csv, odometry.csv)
 - The original RGB video (rgb.mp4)
 - Folders for depth and confidence frames (depth/, confidence/) as PNGs
 
-Locate this folder in the Files app, rename it to your desired name, and move the folder into the **root directory** of your cloned LiDAR-Gait-Analysis repository. Once placed there, the programs are able process and analyze the video.
+Locate this folder in the Files app, rename it to your desired name, and move the folder into the **root directory** of your cloned LiDAR-Gait-Analysis folder. Once placed there, the programs are able process and analyze the video.
 
 To run a [general-lidar](#general-lidar) program (ex. makevideo.py), ensure you are in the root directory of the cloned repo and run
 
