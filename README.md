@@ -82,10 +82,10 @@ To run a [general-lidar](#general-lidar) program (ex. makevideo.py), ensure you 
    python3.10 general-lidar/makevideo.py
    ```
 
-To run a [gait-analysis](#gait-analysis) program (ex. calculateangle.py), ensure you are in the root directory of the cloned repo and run
+To run a [gait-analysis](#gait-analysis) program (ex. detrend.py), ensure you are in the root directory of the cloned repo and run
 
    ```bash
-   python3.10 gait-analysis/calculateangle.py
+   python3.10 gait-analysis/detrend.py
    ```
 
 ## General-LiDAR
