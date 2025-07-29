@@ -47,7 +47,7 @@ Using the MediaPipe pose tracking along with LiDAR data, graphs are generated li
 
 ## Installation
 
-Make sure you have [Anaconda](https://www.anaconda.com/) installed.
+Make sure you have [Anaconda](https://www.anaconda.com/) installed. From the command line:
 
 1. Clone this repository:
 
@@ -63,11 +63,13 @@ Make sure you have [Anaconda](https://www.anaconda.com/) installed.
    conda activate lidar-gait-analysis
    ```
 
+Then complete the steps listed in [Usage](#usage) below.
+
 ## Usage
 
 To utilize the LiDAR capabilities of the iPhone/iPad, you must have a LiDAR-equipped device (iPhone 12+ Pro/Pro Max, or iPad Pro).
 
-The **Stray Scanner** app (available on the App Store) should be used to record LiDAR videos. When recording for gait analysis, press the record video button and ensure the video is recorded at **60 FPS** for accurate joint tracking and analysis.
+The **Stray Scanner** app (available on the App Store) should be used to record LiDAR videos. When recording for gait analysis, press the 'Record new session' button and ensure the video is recorded at **60 FPS** for accurate joint tracking and analysis.
 
 Each video recorded with Stray Scanner is saved to a folder in the **Files** app. This folder includes:
 - Camera intrinsic files (camera_matrix.csv, imu.csv, odometry.csv)
@@ -146,7 +148,7 @@ It first prompts the user to input their LiDAR data folder name as well as an ou
 
 It first prompts the user to input their LiDAR data folder name. In the charts/data folder (which it creates if it doesn't already exist), it creates CSV files for the 3D location of each body part over time, as well as CSV files containing the elbow, knee, and hip angle data in degrees over time. It also creates graphs in PNG format to visualize the distance of each of the body parts from the camera over time and graphs for the angle over time. These are in charts/graphs.
 
-**detrend.py**: This program creates a PNG graph of the distance of body parts (joints) from the camera over time. This data is plotted alongside a trendline, and a detrended line is generated.
+**detrend.py**: This program runs calculate angle if it hasn't already been run, and in addition creates a PNG graph of the distance of body parts (joints) from the camera over time plotted alongside a trendline, and a detrended line is generated.
 
 It first prompts the user to input their LiDAR data folder name. It then creates a PNG graphs of the distance of each body part from the camera over time along with a trendline. It also plots a detrended line by plotting the difference between the actual distance and the trendline over time. These PNG's are saved to charts/detrended/
 
