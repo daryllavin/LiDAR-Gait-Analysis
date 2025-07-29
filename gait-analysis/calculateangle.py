@@ -119,4 +119,5 @@ def main(folder=None, bp=None):
         # Plot and save angle over time
         plot_angle_over_time(l4, input1, f'charts/{folder}/graphs/{input1} angle.png')
 
-main()
+if __name__ == '__main__':
+    main()

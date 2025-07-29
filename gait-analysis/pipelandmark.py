@@ -24,14 +24,14 @@ width, height = 192, 256
 
 def extract_landmarks(folder, input1, input2, input3):
     # Paths
-    video_path = os.path.join("..", folder, "rgb.mp4")
-    depth_folder = os.path.join("..", folder, "depth")
-    conf_folder = os.path.join("..", folder, "confidence")
+    video_path = os.path.join(folder, "rgb.mp4")
+    depth_folder = os.path.join(folder, "depth")
+    conf_folder = os.path.join(folder, "confidence")
     depth_files = sorted(os.listdir(depth_folder))
     conf_files = sorted(os.listdir(conf_folder))
 
     # Load and scale intrinsics
-    csvmatrix = np.loadtxt(f'../{folder}/camera_matrix.csv', delimiter=',')
+    csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
     scale_x = height / 1440
     scale_y = width / 1920
     matrixscaled = csvmatrix.copy()
