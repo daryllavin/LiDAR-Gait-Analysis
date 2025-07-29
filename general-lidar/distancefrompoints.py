@@ -8,17 +8,17 @@ folder = input("Folder name: ")
 output_filename = input("Output file name: ")
 
 #Load camera intrinsics
-csvmatrix = np.loadtxt(f'../{folder}/camera_matrix.csv', delimiter=',')
+csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
 
 #Display total frame count
-numframes = len(os.listdir(f"../{folder}/depth"))
+numframes = len(os.listdir(f"{folder}/depth"))
 print(f"Number of frames: {numframes}")
 
 #Select a frame
 frame = input("Pick a frame (6 digits): ")
 
 #Read depth values and properly rotate (video is initally saved 90 degrees counterclockwise) 
-depth_mm = cv2.imread(f"../{folder}/depth/{frame}.png", cv2.IMREAD_UNCHANGED)
+depth_mm = cv2.imread(f"{folder}/depth/{frame}.png", cv2.IMREAD_UNCHANGED)
 depth_meters = depth_mm / 1000.0
 depth_meters = np.rot90(depth_meters, k=3)
 

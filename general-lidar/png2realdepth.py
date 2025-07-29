@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 folder = input("Folder name: ")
 output_filename = input("Output file name: ")
 
-csvmatrix = np.loadtxt(f'../{folder}/camera_matrix.csv', delimiter=',')
+csvmatrix = np.loadtxt(f'{folder}/camera_matrix.csv', delimiter=',')
 
-numframes = len(os.listdir(f"../{folder}/depth"))
+numframes = len(os.listdir(f"{folder}/depth"))
 
 print(f"Number of frames: {numframes}")
 frame = input("Pick a frame (6 digits): ")
 
-depth_mm = cv2.imread(f"../{folder}/depth/{frame}.png", cv2.IMREAD_UNCHANGED)
+depth_mm = cv2.imread(f"{folder}/depth/{frame}.png", cv2.IMREAD_UNCHANGED)
 
 depth_meters = depth_mm / 1000.0
 
